@@ -1,9 +1,10 @@
 #Client file to connect to server
-#Tyler Judt-Martine,
+#Tyler Judt-Martine, Nazar Potapchuk
 #CSC138
 
 import socket
 import threading
+import sys
 
 def client_in(client):
     while True:
@@ -16,17 +17,20 @@ def client_out(client):
         client.send(message.encode('ascii'))
 
 def Main():
-    host = '127.0.0.1'
-    port = 5000
+	if (len(sys.argv) != 3):
+		print("Usage: python chatclient.py <hostname> <svr_port>")
+		sys.exit(1)
+	host = '127.0.0.1'
+	port = 8008
 
-    client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    client.connect((host, port))
-    
-    threadIn = threading.Thread(target=client_in, args = (client,))
-    threadOut = threading.Thread(target=client_out, args = (client,))
+	client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+	client.connect((host, port))
 
-    threadIn.start()
-    threadOut.start()
+	threadIn = threading.Thread(target=client_in, args = (client,))
+	threadOut = threading.Thread(target=client_out, args = (client,))
+
+	threadIn.start()
+	threadOut.start()
 
 if __name__ == '__main__':
     Main()
