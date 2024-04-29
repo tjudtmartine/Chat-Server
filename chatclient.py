@@ -19,28 +19,6 @@ def client_in(client):
             print("Connection to server lost.")
             break
 
-def client_out(client):
-    while True:
-        message = input('==> ')
-        client.send(message.encode('ascii'))
-
-def join_server(client, username):
-    join_message = f"JOIN {username}"
-    client.send(join_message.encode('ascii'))
-    print(f"{username} joined!")
-
-def list_users(client):
-    list_message = "LIST"
-    client.send(list_message.encode('ascii'))
-
-def send_message(client, recipient, message):
-    mesg_message = f"MESG {recipient} {message}"
-    client.send(mesg_message.encode('ascii'))
-
-def broadcast_message(client, message):
-    bcst_message = f"BCST {message}"
-    client.send(bcst_message.encode('ascii'))
-
 def quit_server(client):
     quit_message = "QUIT"
     client.send(quit_message.encode('ascii'))
@@ -73,26 +51,8 @@ def Main():
 	threadOut.start()
 
 	while True:
-        #command = input("Enter command (LIST, MESG, BCST, QUIT): \n").split()
 		i = input("").split()
-		command = i.split()
-		'''if command[0] == 'LIST':
-            list_users(client)
-        elif command[0] == 'MESG':
-            if len(command) >= 3:
-                recipient = command[1]
-                message = ' '.join(command[2:])
-                send_message(client, recipient, message)
-            else:
-                print("Invalid MESG command format. Use: MESG <recipient> <message>")
-        elif command[0] == 'BCST':
-            if len(command) >= 2:
-                message = ' '.join(command[1:])
-                broadcast_message(client, message)
-            else:
-                print("Invalid BCST command format. Use: BCST <message>")
-		elif command == 'QUIT':
-			quit_server(client)'''	
+		command = i.split()	
 		if command[0] == 'QUIT':
 			quit_server(client)
 			break
