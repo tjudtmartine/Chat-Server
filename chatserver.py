@@ -48,7 +48,7 @@ def msgUser(client_socket, userTo, msg):
 			clientTo_socket = users[userTo]
 			clientTo_socket.send(msg.encode())
 		else:
-			result = "No such user [" + useranme + "] exists"
+			result = "No such user [" + userTo + "] exists"
 			client_socket.send(result.encode())
 	else:
 		registerMsg(client_socket)
