@@ -59,9 +59,10 @@ def msgUser(client_socket, userTo, msg):
 	if registered(client_socket):
 		if userTo in users:
 			clientTo_socket = users[userTo]
-			clientTo_socket.send(msg.encode())
 			for u in users:
 				if users[u] == client_socket:
+					output = u + ": " + msg
+					clientTo_socket.send(output.encode())
 					print(u + " sent " + userTo + ": " + msg)
 		else:
 			result = "No such user [" + userTo + "] exists"
@@ -71,10 +72,14 @@ def msgUser(client_socket, userTo, msg):
 
 def msgRoom(client_socket, msg):
 	if registered(client_socket):
+		output = ""
+		for u in users:
+			if users[u] == client_socket
+				output = u + ": " +  msg
 		for u in users:
 			if users[u] != client_socket:
 				sock = users[u]
-				sock.send(msg.encode())
+				sock.send(output.encode())
 			else:
 				print(u + " sent everyone: " + msg)
 	else:
