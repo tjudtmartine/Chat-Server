@@ -1,6 +1,7 @@
 #Client file to connect to server
-#Tyler Judt-Martine, Dylan Dumitru
+#Tyler Judt-Martine, Dylan Dumitru, Nazar Potapchuk
 #CSC138
+# usage: python client.py <hostname> <port>
 
 import socket
 import threading
@@ -72,8 +73,10 @@ def Main():
     threadOut.start()
     
     while True:
-        command = input("Enter command (LIST, MESG, BCST, QUIT): \n").split()
-        if command[0] == 'LIST':
+        #command = input("Enter command (LIST, MESG, BCST, QUIT): \n").split()
+		i = input("").split()
+		command = i.split()
+        '''if command[0] == 'LIST':
             list_users(client)
         elif command[0] == 'MESG':
             if len(command) >= 3:
@@ -88,13 +91,16 @@ def Main():
                 broadcast_message(client, message)
             else:
                 print("Invalid BCST command format. Use: BCST <message>")
-        elif command[0] == 'QUIT':
+		elif command == 'QUIT':
+			quit_server(client)'''	
+        if command[0] == 'QUIT':
             quit_server(client)
             break
         else:
-            print("Invalid command!")
+        	client.send(i.encode(ascii)
 
     client.close()
 
 if __name__ == '__main__':
     Main()
+
