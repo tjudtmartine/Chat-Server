@@ -20,6 +20,12 @@ def registered(client_socket):
 def registerMsg(client_socket):
 	msg = "You must first register via \"JOIN <username>\" in order to use the chatroom and its functions"
 	client_socket.send(msg.encode())
+	
+def sendOut(client_socket, data):
+	for u in users:
+		if users[u] != client_socket:
+			cSock = users[u]
+			cSock.send(data.encode())
 
 def addUser(client_socket, username):
 	if len(users) < 10:
@@ -29,6 +35,8 @@ def addUser(client_socket, username):
 		else:
 			users[username] = client_socket
 			print(username + " has registered")
+			msg = username + " has joined!"
+			sendOut(client_socket, msg)
 	else:
 		msg = "Sorry, chatroom is currently full"
 		client_socket.send(msg.encode())
@@ -39,6 +47,9 @@ def listUsers(client_socket):
 		for u in users:
 			listOfUsers = listOfUsers + u + "\n"
 		client_socket.send(listOfUsers.encode())
+		for u in users:
+			if users[u] == client_socket:
+				print(u + " has requested list of users")
 	else:
 		registerMsg(client_socket)
 
@@ -47,6 +58,9 @@ def msgUser(client_socket, userTo, msg):
 		if userTo in users:
 			clientTo_socket = users[userTo]
 			clientTo_socket.send(msg.encode())
+			for u in users:
+				if users[u] == client_socket:
+					print(u + " sent " + userTo + ": " + msg)
 		else:
 			result = "No such user [" + userTo + "] exists"
 			client_socket.send(result.encode())
@@ -59,6 +73,8 @@ def msgRoom(client_socket, msg):
 			if users[u] != client_socket:
 				sock = users[u]
 				sock.send(msg.encode())
+			else:
+				print(u + " sent everyone: " + msg)
 	else:
 		registerMsg(client_socket)
 
@@ -117,13 +133,15 @@ def Main():
 	server.listen()
 	client_list = []
 
+	print('Server is listening on ' + host + '...')
+
 	while True:
-        	print('Server is listening on ' + host + '...')
         	client_socket, address = server.accept()
         	print(f'Connected to : {str(address)}')
         	#client_list.append(client_socket)
         	thread = threading.Thread(target=client_connect, args=(client_socket, client_list))
         	thread.start()
+        	
 	server.close()
 
 if __name__ == "__main__":
