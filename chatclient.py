@@ -46,14 +46,14 @@ def quit_server(client):
     client.send(quit_message.encode('ascii'))
 
 def Main():
-    if (len(sys.argv) != 3):
-        print("Usage: python chatclient.py <hostname> <svr_port>")
-        sys.exit(1)
-    host = '127.0.0.1'
-    port = 5000
+	if (len(sys.argv) != 3):
+		print("Usage: python chatclient.py <hostname> <svr_port>")
+		sys.exit(1)
+	host = sys.argv[1]
+	port = sys.argv[2]
 
-    client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    client.connect((host, port))
+	client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+	client.connect((host, port))
 
     # Prompt user to enter their username
     while True:
@@ -65,13 +65,13 @@ def Main():
             print("Invalid format. Please enter in the format: JOIN <username>")
 
     join_server(client, username)
-    
+
     threadIn = threading.Thread(target=client_in, args=(client,))
     threadOut = threading.Thread(target=client_out, args=(client,))
 
     threadIn.start()
     threadOut.start()
-    
+
     while True:
         #command = input("Enter command (LIST, MESG, BCST, QUIT): \n").split()
 		i = input("").split()
