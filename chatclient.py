@@ -11,14 +11,15 @@ def client_in(client):
     while True:
         try:
             message = client.recv(1024).decode('ascii')
-            if message:
-                print(message)
-            else:
-                print("Error")
+            if not message:
+                print("Connection terminated.")
                 break
+            else:
+                print(message)
         except ConnectionError:
             print("Connection to server lost.")
             break
+
 
 def Main():
 	if (len(sys.argv) != 3):
@@ -35,19 +36,31 @@ def Main():
 	thread.start()
 
 	try:
-		print("To join server please enter JOIN <username>")
+		print("To register on server please enter JOIN <username>.")
 		while True:
 			user_input = input("==>")
 			input_split = user_input.split()
-			if len(input_split) == 2 and input_split[0].upper() == 'JOIN':
+			if len(input_split) == 0:
+				print("Please enter a command.")
+			elif len(input_split) == 1:
+				msg = input_split[0].upper()
+				client.send(msg.encode())
+			elif len(input_split) == 2 and input_split[0].upper() == 'JOIN':
 				username = input_split[1]
+				msg = input_split[0].upper() + ' ' + username
+				client.send(msg.encode())
 				print(f"Welcome {username}!")
-			if input_split[0].upper() == 'QUIT':
+			elif input_split[0].upper() == 'MESG':
+				msg = input_split[0].upper() + ' ' + input_split[1] + ' ' + input_split[2]
+				client.send(msg.encode())
+			elif input_split[0].upper() == 'QUIT':
 				client.send(input_split[0].upper().encode('ascii'))
 				print(f"{username} left the chat!")
 				break
-			else:
-				client.send(user_input.encode())
+			elif user_input.strip():
+				#msg = input_split[0].upper() + ' ' + input_split[1]
+				client.send(msg.encode())
+			
 	finally:
 		client.close()
 		sys.exit(1)
