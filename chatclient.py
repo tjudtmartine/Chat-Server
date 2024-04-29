@@ -18,6 +18,11 @@ def client_in(client):
         except ConnectionError:
             print("Connection to server lost.")
             break
+		
+def client_out(client):
+    while True:
+        message = input('==> ')
+        client.send(message.encode('ascii'))
 
 def quit_server(client):
     quit_message = "QUIT"
