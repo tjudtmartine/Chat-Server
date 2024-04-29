@@ -23,7 +23,9 @@ def registerMsg(client_socket):
 	
 def sendOut(client_socket, data):
 	for u in users:
-		if users[u] != client_socket:
+		if users[u] == client_socket:
+			empty = "if"
+		else:
 			cSock = users[u]
 			cSock.send(data.encode())
 
