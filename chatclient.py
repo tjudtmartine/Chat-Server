@@ -56,27 +56,27 @@ def Main():
 	client.connect((host, port))
 
     # Prompt user to enter their username
-    while True:
-        username_input = input("Enter JOIN followed by your username (e.g., JOIN Mike): ").split()
-        if len(username_input) == 2 and username_input[0].upper() == 'JOIN':
-            username = username_input[1]
-            break
-        else:
-            print("Invalid format. Please enter in the format: JOIN <username>")
+	while True:
+		username_input = input("Enter JOIN followed by your username (e.g., JOIN Mike): ").split()
+		if len(username_input) == 2 and username_input[0].upper() == 'JOIN':
+			username = username_input[1]
+			break
+		else:
+			print("Invalid format. Please enter in the format: JOIN <username>")
 
-    join_server(client, username)
+	join_server(client, username)
 
-    threadIn = threading.Thread(target=client_in, args=(client,))
-    threadOut = threading.Thread(target=client_out, args=(client,))
+	threadIn = threading.Thread(target=client_in, args=(client,))
+	threadOut = threading.Thread(target=client_out, args=(client,))
 
-    threadIn.start()
-    threadOut.start()
+	threadIn.start()
+	threadOut.start()
 
-    while True:
+	while True:
         #command = input("Enter command (LIST, MESG, BCST, QUIT): \n").split()
 		i = input("").split()
 		command = i.split()
-        '''if command[0] == 'LIST':
+		'''if command[0] == 'LIST':
             list_users(client)
         elif command[0] == 'MESG':
             if len(command) >= 3:
@@ -93,13 +93,13 @@ def Main():
                 print("Invalid BCST command format. Use: BCST <message>")
 		elif command == 'QUIT':
 			quit_server(client)'''	
-        if command[0] == 'QUIT':
-            quit_server(client)
-            break
-        else:
-        	client.send(i.encode(ascii)
+		if command[0] == 'QUIT':
+			quit_server(client)
+			break
+		else:
+			client.send(i.encode(ascii))
 
-    client.close()
+		client.close()
 
 if __name__ == '__main__':
     Main()
