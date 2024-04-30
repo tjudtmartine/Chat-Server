@@ -19,7 +19,8 @@ def client_in(client):
         except ConnectionError:
             print("Connection to server lost.")
             break
-
+		
+    client.close()
 
 def Main():
 	if (len(sys.argv) != 3):
