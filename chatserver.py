@@ -1,6 +1,6 @@
 #Chat server to handle and send messages between clients
-#Tyler Judt-Martine, Nazar Potapchuk
-#CSC138
+#Tyler Judt-Martine, Nazar Potapchuk, Dylan Dumitru
+#CSC138 Chat Group Project - 04/30/2024
 #usage: python chatserver.py <svr_port>
 
 import socket
@@ -9,6 +9,7 @@ import sys
 
 users = {}
 
+#registered - check if a client is already registered
 def registered(client_socket):
 	result = False
 	for u in users:
@@ -17,8 +18,9 @@ def registered(client_socket):
 			break
 	return result
 
+#registerMsg - Send a registration message to unregistered users. 
 def registerMsg(client_socket):
-	msg = "You must first register via \"JOIN <username>\" in order to use the chatroom and its functions"
+	msg = "Unregistered User:\nYou must first register via \"JOIN <username>\" in order to use the chatroom and its functions"
 	client_socket.send(msg.encode())
 	
 def sendOut(client_socket, data):
@@ -29,6 +31,16 @@ def sendOut(client_socket, data):
 			cSock = users[u]
 			cSock.send(data.encode())
 
+#sendOut - Sends a message to all users with the exeption of the sender. 
+def sendOut(client_socket, data):
+	for u in users:
+		if users[u] == client_socket:
+			empty = "if"
+		else:
+			cSock = users[u]
+			cSock.send(data.encode())
+
+#addUser - handles registering users to the chatroom.
 def addUser(client_socket, username):
 	if len(users) < 10:
 		if registered(client_socket):
@@ -37,12 +49,15 @@ def addUser(client_socket, username):
 		else:
 			users[username] = client_socket
 			print(username + " has registered")
-			msg = username + " has joined!"
+			msg = f"Welcome {username}! Connected to server!"
+			client_socket.send(msg.encode())
+			msg = username + " joined the Chatroom!"
 			sendOut(client_socket, msg)
 	else:
 		msg = "Sorry, chatroom is currently full"
 		client_socket.send(msg.encode())
 
+#listUsers - sends a list of all current users to the requesting client.
 def listUsers(client_socket):
 	if registered(client_socket):
 		listOfUsers = ""
@@ -55,6 +70,7 @@ def listUsers(client_socket):
 	else:
 		registerMsg(client_socket)
 
+#msgUser - sends a private message to a specific user.
 def msgUser(client_socket, userTo, msg):
 	if registered(client_socket):
 		if userTo in users:
@@ -65,26 +81,27 @@ def msgUser(client_socket, userTo, msg):
 					clientTo_socket.send(output.encode())
 					print(u + " sent " + userTo + ": " + msg)
 		else:
-			result = "No such user [" + userTo + "] exists"
+			result = "Unknown Recipient: No such user [" + userTo + "] exists"
 			client_socket.send(result.encode())
 	else:
 		registerMsg(client_socket)
 
+#msgRoom - sends a public message to all users in the chatroom.
 def msgRoom(client_socket, msg):
 	if registered(client_socket):
 		output = ""
 		for u in users:
 			if users[u] == client_socket:
-				output = u + ": " +  msg
+				output = u + ": BCST " +  msg
+				print(u + " sent everyone: " + msg)
 		for u in users:
 			if users[u] != client_socket:
 				sock = users[u]
 				sock.send(output.encode())
-			else:
-				print(u + " sent everyone: " + msg)
 	else:
 		registerMsg(client_socket)
 
+#quit - exists the chatroom and closes clients connection. 
 def quit(client_socket):
 	for u in users:
 		if users[u] == client_socket:
@@ -95,6 +112,7 @@ def quit(client_socket):
 			client_socket.close()
 			break
 
+#unrecognized - handles unrecognized entries from users. 
 def unrecognized(client_socket):
 	prompt = "Unrecognized message\nPossible commands to send:\n"
 	prompt = prompt + "	JOIN <username>			:join chatroom with selected username\n"
@@ -104,14 +122,15 @@ def unrecognized(client_socket):
 	prompt = prompt + "	QUIT					:leave the chatroom\n"
 	client_socket.send(prompt.encode())
 
+#send_out - sends a message to all clients/users.
 def send_out(client_socket, client_list, data):
     for client_socket in client_list:
         client_socket.send(data)
-    
+
+#client_connect - handles client connection and entries. 
 def client_connect(client_socket, client_list):
 	while True:
 		data = client_socket.recv(1024)
-	    #send_out(client_socket, client_list, data)
 		data = data.decode()
 		action = data[0:4]
 		dataSplit = data.split(" ")
@@ -130,6 +149,7 @@ def client_connect(client_socket, client_list):
 		else:
 			unrecognized(client_socket)
 
+#Main - Starts and runs chatserver.
 def Main():
 	if(len(sys.argv) != 2):
 		print("Usage: python chatserver.py <svr_port>")
@@ -144,17 +164,16 @@ def Main():
 	client_list = []
 
 	print('Server is listening on ' + host + '...')
+	print('The Chat Server Started ' + host + '...')
 
 	while True:
-        	client_socket, address = server.accept()
-        	print(f'Connected to : {str(address)}')
-        	#client_list.append(client_socket)
-        	thread = threading.Thread(target=client_connect, args=(client_socket, client_list))
-        	thread.start()
-        	
+		client_socket, address = server.accept()
+		print(f'Connected to : {str(address)}')
+		#client_list.append(client_socket)
+		thread = threading.Thread(target=client_connect, args=(client_socket, client_list))
+		thread.start()
+
 	server.close()
 
 if __name__ == "__main__":
     Main()
-
-
