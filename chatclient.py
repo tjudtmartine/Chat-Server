@@ -1,106 +1,80 @@
 #Client file to connect to server
 #Tyler Judt-Martine, Dylan Dumitru, Nazar Potapchuk
-#CSC138
+#CSC138 Chat Group Project - 04/30/2024
 # usage: python client.py <hostname> <port>
 
 import socket
 import threading
 import sys
 
+
+#client_in function handles incoming messages from the server and prints connection error messages.
 def client_in(client):
     while True:
         try:
             message = client.recv(1024).decode('ascii')
             if not message:
-                print("Connection closed by server.")
+                print("Connection terminated.")
                 break
-            print(message)
+            else:
+                print(message)
         except ConnectionError:
             print("Connection to server lost.")
             break
+    client.close()
 
-def client_out(client):
-    while True:
-        message = input('==> ')
-        client.send(message.encode('ascii'))
-
-def join_server(client, username):
-    join_message = f"JOIN {username}"
-    client.send(join_message.encode('ascii'))
-    print(f"{username} joined!")
-
-def list_users(client):
-    list_message = "LIST"
-    client.send(list_message.encode('ascii'))
-
-def send_message(client, recipient, message):
-    mesg_message = f"MESG {recipient} {message}"
-    client.send(mesg_message.encode('ascii'))
-
-def broadcast_message(client, message):
-    bcst_message = f"BCST {message}"
-    client.send(bcst_message.encode('ascii'))
-
-def quit_server(client):
-    quit_message = "QUIT"
-    client.send(quit_message.encode('ascii'))
-
+#Main function connects chat to the server.
 def Main():
 	if (len(sys.argv) != 3):
 		print("Usage: python chatclient.py <hostname> <svr_port>")
 		sys.exit(1)
 	host = sys.argv[1]
-	port = sys.argv[2]
+	port = int(sys.argv[2])
 
 	client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 	client.connect((host, port))
 
-    # Prompt user to enter their username
-    while True:
-        username_input = input("Enter JOIN followed by your username (e.g., JOIN Mike): ").split()
-        if len(username_input) == 2 and username_input[0].upper() == 'JOIN':
-            username = username_input[1]
-            break
-        else:
-            print("Invalid format. Please enter in the format: JOIN <username>")
+	thread = threading.Thread(target=client_in, args=(client,))
 
-    join_server(client, username)
+	thread.start()
 
-    threadIn = threading.Thread(target=client_in, args=(client,))
-    threadOut = threading.Thread(target=client_out, args=(client,))
-
-    threadIn.start()
-    threadOut.start()
-
-    while True:
-        #command = input("Enter command (LIST, MESG, BCST, QUIT): \n").split()
-		i = input("").split()
-		command = i.split()
-        '''if command[0] == 'LIST':
-            list_users(client)
-        elif command[0] == 'MESG':
-            if len(command) >= 3:
-                recipient = command[1]
-                message = ' '.join(command[2:])
-                send_message(client, recipient, message)
-            else:
-                print("Invalid MESG command format. Use: MESG <recipient> <message>")
-        elif command[0] == 'BCST':
-            if len(command) >= 2:
-                message = ' '.join(command[1:])
-                broadcast_message(client, message)
-            else:
-                print("Invalid BCST command format. Use: BCST <message>")
-		elif command == 'QUIT':
-			quit_server(client)'''	
-        if command[0] == 'QUIT':
-            quit_server(client)
-            break
-        else:
-        	client.send(i.encode(ascii)
-
-    client.close()
+	#Loop exists when user chooses to quit the chat server. Contains all need functionality for interacting with other users via the server. 
+	try:
+		print("To register on server please enter JOIN <username>.")
+		while True:
+			user_input = input('')
+			input_split = user_input.split()
+			if len(input_split) == 0:
+				print("Please enter a command.")
+				#client.send(msg.encode())
+			elif input_split[0].upper() == 'LIST':
+				client.send(input_split[0].upper().encode())
+			elif input_split[0].upper() == 'JOIN':
+				username = input_split[1]
+				msg = input_split[0].upper() + ' ' + username
+				client.send(msg.encode())
+			elif input_split[0].upper() == 'BCST':
+				print(f"{username} is sending a broadcast")
+				double_split = user_input.split(maxsplit=1)
+				msg = double_split[0].upper() + ' ' + double_split[1]
+				client.send(msg.encode())
+			elif input_split[0].upper() == 'MESG':
+				triple_split = user_input.split(maxsplit=2)
+				msg = triple_split[0].upper() + ' ' + triple_split[1] + ' ' + triple_split[2]
+				client.send(msg.encode())
+			elif input_split[0].upper() == 'QUIT':
+				client.send(input_split[0].upper().encode('ascii'))
+				print(f"{username} left the chat!")
+				break
+			else: 
+				client.send(input_split[0].upper().encode('ascii'))
+			
+	finally:
+		thread.join()
+		client.close()
+		sys.exit(1)
 
 if __name__ == '__main__':
     Main()
+
 
