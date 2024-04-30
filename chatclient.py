@@ -38,28 +38,29 @@ def Main():
 	try:
 		print("To register on server please enter JOIN <username>.")
 		while True:
-			user_input = input("==>")
+			user_input = input('')
 			input_split = user_input.split()
 			if len(input_split) == 0:
 				print("Please enter a command.")
-			elif len(input_split) == 1:
-				msg = input_split[0].upper()
-				client.send(msg.encode())
-			elif len(input_split) == 2 and input_split[0].upper() == 'JOIN':
+			elif input_split[0].upper() == 'LIST':
+				client.send(input_split[0].upper().encode())
+			elif input_split[0].upper() == 'JOIN':
 				username = input_split[1]
 				msg = input_split[0].upper() + ' ' + username
 				client.send(msg.encode())
 				print(f"Welcome {username}!")
+			elif input_split[0].upper() == 'BCST':
+				double_split = user_input.split(maxsplit=1)
+				msg = double_split[0].upper() + ' ' + double_split[1]
+				client.send(msg.encode())
 			elif input_split[0].upper() == 'MESG':
-				msg = input_split[0].upper() + ' ' + input_split[1] + ' ' + input_split[2]
+				triple_split = user_input.split(maxsplit=2)
+				msg = triple_split[0].upper() + ' ' + triple_split[1] + ' ' + triple_split[2]
 				client.send(msg.encode())
 			elif input_split[0].upper() == 'QUIT':
 				client.send(input_split[0].upper().encode('ascii'))
 				print(f"{username} left the chat!")
 				break
-			elif user_input.strip():
-				#msg = input_split[0].upper() + ' ' + input_split[1]
-				client.send(msg.encode())
 			
 	finally:
 		client.close()
