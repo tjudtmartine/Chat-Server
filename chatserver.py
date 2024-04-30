@@ -74,7 +74,7 @@ def msgRoom(client_socket, msg):
 	if registered(client_socket):
 		output = ""
 		for u in users:
-			if users[u] == client_socket
+			if users[u] == client_socket:
 				output = u + ": " +  msg
 		for u in users:
 			if users[u] != client_socket:
