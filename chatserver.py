@@ -88,6 +88,9 @@ def msgRoom(client_socket, msg):
 def quit(client_socket):
 	for u in users:
 		if users[u] == client_socket:
+			msg = u + " has left the chatroom"
+			sendOut(client_socket, msg)
+			print(u + " has left the chatroom")
 			users.pop(u)
 			client_socket.close()
 			break
