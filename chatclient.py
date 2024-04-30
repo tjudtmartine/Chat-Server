@@ -64,6 +64,7 @@ def Main():
 				break
 			
 	finally:
+		thread.join()
 		client.close()
 		sys.exit(1)
 
